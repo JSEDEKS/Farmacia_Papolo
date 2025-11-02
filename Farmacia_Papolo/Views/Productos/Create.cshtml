@@ -1,0 +1,50 @@
+﻿@model Farmacia_Paolo.Models.Producto
+
+@{
+    ViewData["Title"] = "Crear Producto";
+}
+
+<h1>Agregar Producto</h1>
+
+<hr />
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Nombre" class="control-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Fabricante" class="control-label"></label>
+        <input asp-for="Fabricante" class="form-control" />
+        <span asp-validation-for="Fabricante" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="FechaVencimiento" class="control-label"></label>
+        <input asp-for="FechaVencimiento" type="date" class="form-control" />
+        <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Precio" class="control-label"></label>
+        <input asp-for="Precio" class="form-control" />
+        <span asp-validation-for="Precio" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Cantidad" class="control-label"></label>
+        <input asp-for="Cantidad" class="form-control" />
+        <span asp-validation-for="Cantidad" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Categoria" class="control-label"></label>
+        <input asp-for="Categoria" class="form-control" />
+        <span asp-validation-for="Categoria" class="text-danger"></span>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-success">💾 Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">↩️ Volver</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
