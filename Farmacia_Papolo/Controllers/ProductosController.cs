@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; 
 using Microsoft.EntityFrameworkCore;
 using Farmacia_Paolo.Models;
 
@@ -18,8 +20,9 @@ namespace Farmacia_Paolo.Controllers
         // GET: Productos
         public async Task<IActionResult> Index()
         {
-            var productos = await _context.Productos.ToListAsync();
-            return View(productos);
+            
+            var productos = _context.Productos.Include(p => p.Proveedor);
+            return View(await productos.ToListAsync());
         }
 
         // GET: Productos/Details/5
@@ -28,8 +31,11 @@ namespace Farmacia_Paolo.Controllers
             if (id == null)
                 return NotFound();
 
+            // pueda mostrar toda la información: el proveedor y el stock (lotes).
             var producto = await _context.Productos
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(p => p.Proveedor)
+                .Include(p => p.Lotes) // Trae los lotes asociados
+                .FirstOrDefaultAsync(m => m.ProductoID == id); 
 
             if (producto == null)
                 return NotFound();
@@ -40,13 +46,16 @@ namespace Farmacia_Paolo.Controllers
         // GET: Productos/Create
         public IActionResult Create()
         {
+
+            ViewData["ProveedorID"] = new SelectList(_context.Proveedores, "ProveedorID", "NombreProveedor");
             return View();
         }
 
         // POST: Productos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Fabricante,FechaVencimiento,Precio,Cantidad,Categoria")] Producto producto)
+
+        public async Task<IActionResult> Create([Bind("ProductoID,Nombre,Codigo,Categoria,Precio,StockMinimo,ProveedorID")] Producto producto)
         {
             if (ModelState.IsValid)
             {
@@ -54,6 +63,9 @@ namespace Farmacia_Paolo.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+          
+            ViewData["ProveedorID"] = new SelectList(_context.Proveedores, "ProveedorID", "NombreProveedor", producto.ProveedorID);
             return View(producto);
         }
 
@@ -63,19 +75,23 @@ namespace Farmacia_Paolo.Controllers
             if (id == null)
                 return NotFound();
 
+            // Buscamos por ProductoID
             var producto = await _context.Productos.FindAsync(id);
             if (producto == null)
                 return NotFound();
 
+            // Pasamos la lista de Proveedores 
+            ViewData["ProveedorID"] = new SelectList(_context.Proveedores, "ProveedorID", "NombreProveedor", producto.ProveedorID);
             return View(producto);
         }
 
         // POST: Productos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Fabricante,FechaVencimiento,Precio,Cantidad,Categoria")] Producto producto)
+        
+        public async Task<IActionResult> Edit(int id, [Bind("ProductoID,Nombre,Codigo,Categoria,Precio,StockMinimo,ProveedorID")] Producto producto)
         {
-            if (id != producto.Id)
+            if (id != producto.ProductoID)
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -87,13 +103,15 @@ namespace Farmacia_Paolo.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductoExists(producto.Id))
+                    if (!ProductoExists(producto.ProductoID)) 
                         return NotFound();
                     else
                         throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
+            //  Si hay un error, recargamos la lista de Proveedores.
+            ViewData["ProveedorID"] = new SelectList(_context.Proveedores, "ProveedorID", "NombreProveedor", producto.ProveedorID);
             return View(producto);
         }
 
@@ -103,8 +121,10 @@ namespace Farmacia_Paolo.Controllers
             if (id == null)
                 return NotFound();
 
+            // Incluimos el Proveedor para mostrar un resumen amigable en la confirmación
             var producto = await _context.Productos
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(p => p.Proveedor)
+                .FirstOrDefaultAsync(m => m.ProductoID == id); 
 
             if (producto == null)
                 return NotFound();
@@ -115,20 +135,32 @@ namespace Farmacia_Paolo.Controllers
         // POST: Productos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id) 
         {
             var producto = await _context.Productos.FindAsync(id);
-            if (producto != null)
+            if (producto == null) 
+                return NotFound();
+
+            try
             {
+                //  Agregamos un try-catch. Si este producto tiene Lotes
                 _context.Productos.Remove(producto);
                 await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateException /* ex */)
+            {
+                // El borrado falló, 
+                // Enviamos un error a la vista.
+                TempData["Error"] = "No se puede eliminar el producto porque tiene lotes de inventario registrados.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         private bool ProductoExists(int id)
         {
-            return _context.Productos.Any(e => e.Id == id);
+
+            return _context.Productos.Any(e => e.ProductoID == id);
         }
     }
 }
