@@ -18,12 +18,31 @@ namespace Farmacia_Paolo.Controllers
         }
 
         // GET: Productos
-        public async Task<IActionResult> Index()
+        // GET: Productos
+        // GET: Productos
+        public async Task<IActionResult> Index(string? searchString)
         {
-            
-            var productos = _context.Productos.Include(p => p.Proveedor);
-            return View(await productos.ToListAsync());
+            // Incluye el proveedor para mostrar el nombre en la tabla
+            var productosQuery = _context.Productos
+                .Include(p => p.Proveedor)
+                .AsQueryable();
+
+            // Lógica de búsqueda simple
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                productosQuery = productosQuery.Where(p =>
+                    p.Nombre.Contains(searchString) ||
+                    p.Codigo.Contains(searchString) ||
+                    p.Categoria.Contains(searchString) ||
+                    p.Proveedor.NombreProveedor.Contains(searchString));
+            }
+
+            // Ejecuta la consulta
+            var productos = await productosQuery.ToListAsync();
+            s
+            return View(productos);
         }
+
 
         // GET: Productos/Details/5
         public async Task<IActionResult> Details(int? id)
