@@ -67,9 +67,7 @@
                                             <a asp-action="Delete" asp-route-id="@producto.ProductoID" class="btn btn-danger btn-sm">
                                                 <i class="bi bi-trash"></i> Eliminar
                                             </a>
-                                            <a asp-action="LotesPorProducto" asp-route-id="@producto.ProductoID" class="btn btn-info btn-sm text-white">
-                                                <i class="bi bi-box-seam"></i> Lotes
-                                            </a>
+                                            <a asp-controller="Lotes" asp-action="Index" asp-route-productoId="@producto.ProductoID" class="btn btn-sm btn-success">Ver Lotes</a>
                                         </div>
                                     </td>
                                 </tr>
