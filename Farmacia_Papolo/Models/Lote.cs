@@ -31,14 +31,16 @@ namespace Farmacia_Paolo.Models
         public DateTime FechaEntrada { get; set; }
 
         // --- Relación con Producto ---
-        [Required]
         [Display(Name = "Producto")]
         public int ProductoID { get; set; }
 
+        // ⚠️ Aquí quita el [Required]
         [ForeignKey("ProductoID")]
-        public virtual Producto Producto { get; set; }
+        public virtual Producto? Producto { get; set; }
 
         // --- Relación con Movimientos ---
-        public virtual ICollection<MovimientoInventario> Movimientos { get; set; }
+        // ⚠️ También hazla opcional (no [Required])
+        public virtual ICollection<MovimientoInventario>? Movimientos { get; set; }
+
     }
 }

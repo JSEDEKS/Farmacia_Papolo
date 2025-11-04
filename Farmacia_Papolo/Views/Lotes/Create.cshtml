@@ -2,51 +2,79 @@
 @using Farmacia_Paolo.Models
 
 @{
-    var prod = (Producto)ViewData["Producto"];
+    var prod = ViewData["Producto"] as Producto ?? new Producto { Nombre = "", ProductoID = Model?.ProductoID ?? 0 };
     ViewData["Title"] = $"Registrar Nuevo Lote para: {prod.Nombre}";
 }
 
 <h1>@ViewData["Title"]</h1>
 
-<form asp-action="Create" method="post" class="col-12 col-lg-8 col-xl-6">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="ProductoID" />
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 
-    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-    <div class="mb-3">
-        <label asp-for="NumeroLote" class="form-label"></label>
-        <input asp-for="NumeroLote" class="form-control" placeholder="Ej. L-2025-0001" />
-        <span asp-validation-for="NumeroLote" class="text-danger"></span>
+<!-- Bloque de diagnóstico: muestra TODOS los errores del ModelState -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-warning">
+        <strong>Errores de validación:</strong>
+        <ul class="mb-0">
+            @foreach (var kv in ViewData.ModelState)
+            {
+                foreach (var err in kv.Value.Errors)
+                {
+                    <li><code>@kv.Key</code>: @err.ErrorMessage</li>
+                }
+            }
+        </ul>
     </div>
+}
 
-    <div class="mb-3">
-        <label asp-for="CantidadActual" class="form-label"></label>
-        <input asp-for="CantidadActual" type="number" min="0" step="1" class="form-control" />
-        <span asp-validation-for="CantidadActual" class="text-danger"></span>
-    </div>
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post" class="col-12">
+            @Html.AntiForgeryToken()
 
-    <div class="row g-3">
-        <div class="col-md-6">
-            <label asp-for="FechaVencimiento" class="form-label"></label>
-            <input asp-for="FechaVencimiento" type="date" class="form-control" />
-            <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
-        </div>
-        <div class="col-md-6">
-            <label asp-for="FechaEntrada" class="form-label"></label>
-            <input asp-for="FechaEntrada" type="date" class="form-control" />
-            <span asp-validation-for="FechaEntrada" class="text-danger"></span>
-        </div>
-    </div>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Guardar Lote</button>
-        <a class="btn btn-outline-secondary ms-2"
-           asp-action="Index" asp-route-productoId="@Model.ProductoID">
-            Cancelar
-        </a>
+            <!-- IMPORTANTE: enviar el ProductoID -->
+            <input type="hidden" asp-for="ProductoID" value="@Model.ProductoID" />
+
+            <div class="mb-3">
+                <label asp-for="NumeroLote" class="form-label"></label>
+                <input asp-for="NumeroLote" class="form-control" />
+                <span asp-validation-for="NumeroLote" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CantidadActual" class="form-label"></label>
+                <input asp-for="CantidadActual" type="number" min="0" class="form-control" value="@(Model.CantidadActual)" />
+                <span asp-validation-for="CantidadActual" class="text-danger"></span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="FechaVencimiento" class="form-label"></label>
+                    <input asp-for="FechaVencimiento" type="date" class="form-control"
+                           value="@(Model.FechaVencimiento == default ? "" : Model.FechaVencimiento.ToString("yyyy-MM-dd"))" />
+                    <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="FechaEntrada" class="form-label"></label>
+                    <input asp-for="FechaEntrada" type="date" class="form-control"
+                           value="@(Model.FechaEntrada == default ? DateTime.Today.ToString("yyyy-MM-dd") : Model.FechaEntrada.ToString("yyyy-MM-dd"))" />
+                    <span asp-validation-for="FechaEntrada" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Guardar Lote</button>
+                <a asp-action="Index" asp-route-productoId="@Model.ProductoID"
+                   class="btn btn-outline-secondary ms-2">Cancelar</a>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
