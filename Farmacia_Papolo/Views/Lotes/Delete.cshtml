@@ -1,6 +1,27 @@
-﻿namespace Farmacia_Papolo.Views.Lotes
-{
-    public class Delete
-    {
-    }
+﻿@model Farmacia_Paolo.Models.Lote
+@{
+    ViewData["Title"] = "Eliminar Lote";
 }
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="alert alert-warning">
+    ¿Seguro que deseas eliminar el lote <strong>@Model.NumeroLote</strong>?
+    <div class="mt-2"><strong>Producto:</strong> @Model.Producto?.Nombre</div>
+    <div><strong>Cantidad actual:</strong> @Model.CantidadActual</div>
+
+    @if (Model.CantidadActual > 0)
+    {
+        <div class="mt-2 text-danger fw-bold">
+            No se puede eliminar porque aún tiene stock.
+        </div>
+    }
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="LoteID" />
+    <button type="submit" class="btn btn-danger" @(Model.CantidadActual > 0 ? "disabled" : "")>Eliminar</button>
+    <a class="btn btn-outline-secondary ms-2"
+       asp-action="Index" asp-route-productoId="@Model.ProductoID">Cancelar</a>
+</form>

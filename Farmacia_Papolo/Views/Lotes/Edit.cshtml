@@ -1,6 +1,55 @@
-﻿namespace Farmacia_Papolo.Views.Lotes
-{
-    public class Edit
-    {
-    }
+﻿@model Farmacia_Paolo.Models.Lote
+@using Farmacia_Paolo.Models
+
+@{
+    var prod = (Producto)ViewData["Producto"];
+    ViewData["Title"] = $"Editar Lote: {Model.NumeroLote} · {prod.Nombre}";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit"
+      asp-route-id="@Model.LoteID"
+      method="post"
+      class="col-12 col-lg-8 col-xl-6">
+    @Html.AntiForgeryToken()
+
+    <!-- Campos ocultos -->
+    <input type="hidden" asp-for="LoteID" />
+    <input type="hidden" asp-for="ProductoID" />
+
+    <!-- Número de lote (solo lectura, pero se envía al backend) -->
+    <div class="mb-3">
+        <label asp-for="NumeroLote" class="form-label"></label>
+        <input asp-for="NumeroLote" class="form-control" readonly />
+        <input type="hidden" asp-for="NumeroLote" />
+        <span asp-validation-for="NumeroLote" class="text-danger"></span>
+    </div>
+
+    <!-- Fechas -->
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="FechaVencimiento" class="form-label"></label>
+            <input asp-for="FechaVencimiento" type="date" class="form-control" />
+            <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="FechaEntrada" class="form-label"></label>
+            <input asp-for="FechaEntrada" type="date" class="form-control" />
+            <span asp-validation-for="FechaEntrada" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a asp-action="Index"
+           asp-route-productoId="@Model.ProductoID"
+           class="btn btn-outline-secondary ms-2">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

@@ -1,6 +1,53 @@
-﻿namespace Farmacia_Papolo.Views.Lotes
-{
-    public class Create
-    {
-    }
+﻿@model Farmacia_Paolo.Models.Lote
+@using Farmacia_Paolo.Models
+
+@{
+    var prod = (Producto)ViewData["Producto"];
+    ViewData["Title"] = $"Registrar Nuevo Lote para: {prod.Nombre}";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post" class="col-12 col-lg-8 col-xl-6">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="ProductoID" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="NumeroLote" class="form-label"></label>
+        <input asp-for="NumeroLote" class="form-control" placeholder="Ej. L-2025-0001" />
+        <span asp-validation-for="NumeroLote" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CantidadActual" class="form-label"></label>
+        <input asp-for="CantidadActual" type="number" min="0" step="1" class="form-control" />
+        <span asp-validation-for="CantidadActual" class="text-danger"></span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="FechaVencimiento" class="form-label"></label>
+            <input asp-for="FechaVencimiento" type="date" class="form-control" />
+            <span asp-validation-for="FechaVencimiento" class="text-danger"></span>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="FechaEntrada" class="form-label"></label>
+            <input asp-for="FechaEntrada" type="date" class="form-control" />
+            <span asp-validation-for="FechaEntrada" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Guardar Lote</button>
+        <a class="btn btn-outline-secondary ms-2"
+           asp-action="Index" asp-route-productoId="@Model.ProductoID">
+            Cancelar
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }

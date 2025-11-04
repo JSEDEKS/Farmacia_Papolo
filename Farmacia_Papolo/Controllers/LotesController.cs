@@ -321,7 +321,14 @@ namespace Farmacia_Paolo.Controllers
                 // (Si no configuraste OnDelete.Restrict en MovimientoInventario -> Lote)
                 TempData["Error"] = "No se puede eliminar el lote porque tiene un historial de movimientos.";
                 return RedirectToAction(nameof(Index), new { productoId = productoId });
+
+
             }
+
+
+
+
         }
+
     }
 }
