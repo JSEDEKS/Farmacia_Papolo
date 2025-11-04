@@ -1,6 +1,40 @@
-﻿namespace Farmacia_Papolo.Views.Lotes
-{
-    public class Edit
-    {
+﻿@model Farmacia_Paolo.Models.Proveedor
+
+@{
+    ViewData["Title"] = "Editar Proveedor";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="ProveedorID" />
+
+        <div class="mb-3">
+            <label asp-for="NombreProveedor" class="form-label"></label>
+            <input asp-for="NombreProveedor" class="form-control" />
+            <span asp-validation-for="NombreProveedor" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="RNC" class="form-label"></label>
+            <input asp-for="RNC" class="form-control" />
+            <span asp-validation-for="RNC" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Telefono" class="form-label"></label>
+            <input asp-for="Telefono" class="form-control" />
+            <span asp-validation-for="Telefono" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

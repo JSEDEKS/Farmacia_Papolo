@@ -1,6 +1,32 @@
-﻿namespace Farmacia_Papolo.Views.Lotes
-{
-    public class Delete
-    {
-    }
+﻿@model Farmacia_Paolo.Models.Proveedor
+
+@{
+    ViewData["Title"] = "Eliminar Proveedor";
 }
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-danger">@ViewData["Title"]</h2>
+
+    <h5>¿Está seguro de que desea eliminar este proveedor?</h5>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Nombre</dt>
+                <dd class="col-sm-9">@Model.NombreProveedor</dd>
+
+                <dt class="col-sm-3">RNC</dt>
+                <dd class="col-sm-9">@Model.RNC</dd>
+
+                <dt class="col-sm-3">Teléfono</dt>
+                <dd class="col-sm-9">@Model.Telefono</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="DeleteConfirmed" method="post" class="mt-3">
+        <input type="hidden" asp-for="ProveedorID" />
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
