@@ -97,6 +97,7 @@ namespace Farmacia_Paolo.Controllers
         }
 
         // GET: Proveedores/Delete/5
+        // (Este método GET está perfecto, es el que muestra la página de confirmación)
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -111,19 +112,22 @@ namespace Farmacia_Paolo.Controllers
             return View(proveedor);
         }
 
-        // POST: Proveedores/Delete/5
-        [HttpPost, ActionName("Delete")]
+
+        [HttpPost] // <-- CAMBIO 1: Se quitó [ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        // CAMBIO 2: Se cambió el parámetro 'int id' por 'int ProveedorID'
+        //          para que coincida con el <input asp-for="ProveedorID"> del formulario.
+        public async Task<IActionResult> DeleteConfirmed(int ProveedorID)
         {
-            var proveedor = await _context.Proveedores.FindAsync(id);
+            // CAMBIO 3: Se usa 'ProveedorID' para buscar, en lugar de 'id'
+            var proveedor = await _context.Proveedores.FindAsync(ProveedorID);
+
             if (proveedor == null)
                 return NotFound();
 
             try
             {
-                // Esto fallará si el proveedor tiene productos asociados
-                // (gracias a la regla OnDelete.Restrict que esta en el Context).
+                // Tu lógica de Try/Catch ya era correcta.
                 _context.Proveedores.Remove(proveedor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));

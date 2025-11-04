@@ -36,9 +36,9 @@ namespace Farmacia_Paolo.Models
         public int ProductoID { get; set; }
 
         [ForeignKey("ProductoID")]
-        public virtual Producto Producto { get; set; }
+        public virtual Producto? Producto { get; set; }
 
         // --- Relación con Movimientos ---
-        public virtual ICollection<MovimientoInventario> Movimientos { get; set; }
+        public virtual ICollection<MovimientoInventario> Movimientos { get; set; } = new List<MovimientoInventario>();
     }
 }

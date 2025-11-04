@@ -179,11 +179,11 @@ namespace Farmacia_Paolo.Controllers
                 ProductoNombre = lote.Producto.Nombre,
                 LoteNumero = lote.NumeroLote,
                 CantidadActual = lote.CantidadActual,
-                TipoMovimiento = "Merma", 
+                TipoMovimiento = "Merma",
                 CantidadAjuste = 1
             };
 
-            return View(viewModel); 
+            return View(viewModel);
         }
 
         // POST: Lotes/AjustarStock
@@ -226,7 +226,7 @@ namespace Farmacia_Paolo.Controllers
                         {
                             LoteID = viewModel.LoteID,
                             UsuarioID = 1, // TEMPORAL: Reemplazar con ID de usuario logueado
-                            TipoMovimiento = viewModel.TipoMovimiento, 
+                            TipoMovimiento = viewModel.TipoMovimiento,
                             Cantidad = viewModel.CantidadAjuste,
                             FechaMovimiento = DateTime.Now,
                             Motivo = viewModel.Motivo
@@ -238,7 +238,7 @@ namespace Farmacia_Paolo.Controllers
                         {
                             lote.CantidadActual += viewModel.CantidadAjuste;
                         }
-                        else 
+                        else
                         {
                             lote.CantidadActual -= viewModel.CantidadAjuste;
                         }
@@ -321,7 +321,14 @@ namespace Farmacia_Paolo.Controllers
                 // (Si no configuraste OnDelete.Restrict en MovimientoInventario -> Lote)
                 TempData["Error"] = "No se puede eliminar el lote porque tiene un historial de movimientos.";
                 return RedirectToAction(nameof(Index), new { productoId = productoId });
+
+
             }
+
+
+
+
         }
+
     }
 }

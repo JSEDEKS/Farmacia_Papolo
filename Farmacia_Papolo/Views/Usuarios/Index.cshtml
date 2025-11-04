@@ -1,6 +1,58 @@
-﻿namespace Farmacia_Papolo.Views.Lotes
-{
-    public class Index
-    {
-    }
+﻿@model IEnumerable<Farmacia_Paolo.Models.Proveedor>
+
+@{
+    ViewData["Title"] = "Gestión de Proveedores";
 }
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="mb-3 text-end">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Crear Nuevo Proveedor
+        </a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre del Proveedor</th>
+                <th>RNC</th>
+                <th>Teléfono</th>
+                <th class="text-center" style="width:180px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var proveedor in Model)
+                {
+                    <tr>
+                        <td>@proveedor.NombreProveedor</td>
+                        <td>@proveedor.RNC</td>
+                        <td>@proveedor.Telefono</td>
+                        <td class="text-center">
+                            <a asp-action="Edit" asp-route-id="@proveedor.ProveedorID" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil-square"></i> Editar
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@proveedor.ProveedorID" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No hay proveedores registrados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

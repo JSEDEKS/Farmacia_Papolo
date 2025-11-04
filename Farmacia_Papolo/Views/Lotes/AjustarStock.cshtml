@@ -7,50 +7,101 @@
 <h1>@ViewData["Title"]</h1>
 
 <h4>Producto: @Model.ProductoNombre</h4>
-<h5>Lote: @Model.LoteNumero (Stock Actual: @Model.CantidadActual)</h5>
+<h5>Lote: @Model.LoteNumero</h5>
 <hr />
 
 <div class="row">
     <div class="col-md-6">
-        <form asp-action="AjustarStock">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form asp-action="AjustarStock" method="post" class="col-12" id="form-ajuste">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <!-- Requeridos por tu controlador -->
             <input type="hidden" asp-for="LoteID" />
             <input type="hidden" asp-for="ProductoNombre" />
             <input type="hidden" asp-for="LoteNumero" />
-            <input type="hidden" asp-for="CantidadActual" />
 
+            <!-- Stock actual (para JS y para el server si re-renderiza) -->
+            <div class="mb-2">
+                <strong>Stock actual:</strong> <span id="stock-actual">@Model.CantidadActual</span>
+            </div>
+            <input type="hidden" asp-for="CantidadActual" id="CantidadActualHidden" />
+
+            <!-- Campos que espera el controlador (rellenados por JS antes del submit) -->
+            <input type="hidden" asp-for="TipoMovimiento" id="TipoMovimientoHidden" />
+            <input type="hidden" asp-for="CantidadAjuste" id="CantidadAjusteHidden" />
+
+            <!-- Nuevo stock total -->
             <div class="form-group mb-3">
-                <label asp-for="TipoMovimiento" class="control-label"></label>
-                <select asp-for="TipoMovimiento" class="form-select">
-                    <option value="Merma">Merma (Pérdida/Vencimiento)</option>
-                    <option value="Ajuste Negativo">Ajuste Negativo (Conteo)</option>
-                    <option value="Ajuste Positivo">Ajuste Positivo (Conteo)</option>
-                </select>
-                <span asp-validation-for="TipoMovimiento" class="text-danger"></span>
+                <label for="NuevoStock" class="control-label fw-bold">Nuevo stock total</label>
+                <input id="NuevoStock" type="number" min="0" class="form-control" placeholder="Ej. 25" />
+                <div class="form-text">El sistema calculará automáticamente si debe sumar o restar.</div>
             </div>
 
-            <div class="form-group mb-3">
-                <label asp-for="CantidadAjuste" class="control-label"></label>
-                <input asp-for="CantidadAjuste" class="form-control" type="number" min="1" />
-                <span asp-validation-for="CantidadAjuste" class="text-danger"></span>
-            </div>
-
+            <!-- Motivo -->
             <div class="form-group mb-3">
                 <label asp-for="Motivo" class="control-label"></label>
-                <textarea asp-for="Motivo" class="form-control" rows="3"></textarea>
+                <textarea asp-for="Motivo" class="form-control" rows="3" placeholder="Motivo del ajuste (opcional)"></textarea>
                 <span asp-validation-for="Motivo" class="text-danger"></span>
             </div>
 
             <div class="form-group mt-3">
-                <input type="submit" value="Guardar Ajuste" class="btn btn-primary" />
-                <a asp-controller="Productos" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <a asp-controller="Productos" asp-action="Index" class="btn btn-secondary ms-2">Cancelar</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const form = document.getElementById('form-ajuste');
+
+            const stockActualSpan = document.getElementById('stock-actual');
+            const stockActual = Number(stockActualSpan.textContent);
+
+            const nuevoStockInput = document.getElementById('NuevoStock');
+
+            const tipoMovimientoHidden = document.getElementById('TipoMovimientoHidden');
+            const cantidadAjusteHidden = document.getElementById('CantidadAjusteHidden');
+
+            form.addEventListener('submit', function (e) {
+                const nuevo = Number(nuevoStockInput.value);
+
+                if (!Number.isFinite(nuevo) || nuevo < 0) {
+                    e.preventDefault();
+                    alert('El nuevo stock debe ser un número mayor o igual a 0.');
+                    return;
+                }
+
+                const delta = nuevo - stockActual;
+
+                if (delta === 0) {
+                    e.preventDefault();
+                    alert('El nuevo stock es igual al actual. No hay nada que ajustar.');
+                    return;
+                }
+
+                if (delta > 0) {
+                    // Subir stock
+                    tipoMovimientoHidden.value = 'Ajuste Positivo';
+                    cantidadAjusteHidden.value = String(delta);
+                } else {
+                    // Bajar stock (no se puede bajar por debajo de 0)
+                    const resta = Math.abs(delta);
+                    if (resta > stockActual) {
+                        e.preventDefault();
+                        alert('No puedes descontar más de lo que hay en stock.');
+                        return;
+                    }
+                    // Usa “Ajuste Negativo” por defecto (puedes cambiar a "Merma" si prefieres)
+                    tipoMovimientoHidden.value = 'Ajuste Negativo';
+                    cantidadAjusteHidden.value = String(resta);
+                }
+            });
+        })();
+    </script>
 }

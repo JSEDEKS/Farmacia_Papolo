@@ -24,6 +24,6 @@ namespace Farmacia_Paolo.Models
 
         // --- Relación con Productos ---
         // Un proveedor puede suplir muchos productos
-        public virtual ICollection<Producto> Productos { get; set; }
+        public virtual ICollection<Producto> Productos { get; set; } = new List<Producto>();
     }
 }
