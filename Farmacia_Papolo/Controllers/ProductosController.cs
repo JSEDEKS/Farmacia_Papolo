@@ -39,7 +39,7 @@ namespace Farmacia_Paolo.Controllers
 
             // Ejecuta la consulta
             var productos = await productosQuery.ToListAsync();
-            s
+            
             return View(productos);
         }
 
